@@ -1,0 +1,6 @@
+var
+  i : integer;
+begin
+  repeat
+    i := 1;
+  end.

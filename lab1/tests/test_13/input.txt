@@ -1,0 +1,9 @@
+var
+  i : integer;
+begin
+  { инициализация }
+  i := 1;
+  repeat
+    i++;
+  until i > 5;
+end.

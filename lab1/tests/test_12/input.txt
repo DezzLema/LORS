@@ -1,0 +1,10 @@
+var
+  a, b, c : integer;
+begin
+  a := 1;
+  b := 2;
+  c := a + b;
+  repeat
+    a++;
+  until a > 10;
+end.

@@ -1,0 +1,8 @@
+var
+  i : integer;
+begin
+  i := 1;
+  repeat
+    i++;
+  until z > 10;
+end.

@@ -52,10 +52,12 @@ class Parser:
 
     def parse_var_decl(self):
         decl = self.node('var_decl')
-        decl.append(self.node('ident', name=self.consume('ID')['value']))
+        t = self.consume('ID')
+        decl.append(self.node('ident', name=t['value'], line=t['line']))
         while self.peek() and self.peek()['value'] == ',':
             self.consume('DELIM', ',')
-            decl.append(self.node('ident', name=self.consume('ID')['value']))
+            t = self.consume('ID')
+            decl.append(self.node('ident', name=t['value'], line=t['line']))
         self.consume('DELIM', ':')
         decl.append(self.node('type', name=self.consume('KW')['value']))
         self.consume('DELIM', ';')
@@ -90,17 +92,18 @@ class Parser:
         return node
 
     def parse_assign_or_incr(self):
-        ident = self.consume('ID')['value']
+        tok = self.consume('ID')
+        ident, line = tok['value'], tok['line']
         t = self.peek()
         if t and t['value'] == '++':
             self.consume('OP', '++')
             self.consume('DELIM', ';')
-            return self.node('increment', var=ident)
+            return self.node('increment', var=ident, line=line)
         elif t and t['value'] == ':=':
             self.consume('OP', ':=')
             expr = self.parse_expr()
             self.consume('DELIM', ';')
-            assign = self.node('assign', var=ident)
+            assign = self.node('assign', var=ident, line=line)
             assign.append(expr)
             return assign
         else:
@@ -129,7 +132,7 @@ class Parser:
         t = self.peek()
         if t['type'] == 'ID':
             self.consume('ID')
-            return self.node('ident', name=t['value'])
+            return self.node('ident', name=t['value'], line=t['line'])
         elif t['type'] == 'NUM':
             self.consume('NUM')
             return self.node('number', value=t['value'])
