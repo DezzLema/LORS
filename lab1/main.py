@@ -149,7 +149,7 @@ def to_xml(tokens, kw_table, id_table, encoded) -> str:
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
 
-    with open(os.path.join(here, 'input.txt'), encoding='utf-8') as f:
+    with open(os.path.join(here, 'InputOutput', 'input.txt'), encoding='utf-8') as f:
         src = f.read()
 
     print("Исходный код")
@@ -176,7 +176,7 @@ def main():
     print(' '.join(encoded))
 
     xml_out = to_xml(tokens, kw_table, id_table, encoded)
-    out_path = os.path.join(here, 'tokens.xml')
+    out_path = os.path.join(here, 'xml', 'tokens.xml')
     with open(out_path, 'w', encoding='utf-8') as f:
         f.write(xml_out)
 

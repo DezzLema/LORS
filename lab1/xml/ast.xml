@@ -1,0 +1,31 @@
+<?xml version="1.0" ?>
+<program>
+  <var_block>
+    <var_decl>
+      <ident name="i"/>
+      <ident name="sum"/>
+      <type name="integer"/>
+    </var_decl>
+  </var_block>
+  <block>
+    <assign var="i">
+      <number value="1"/>
+    </assign>
+    <assign var="sum">
+      <number value="0"/>
+    </assign>
+    <repeat>
+      <assign var="sum">
+        <binop op="+">
+          <ident name="sum"/>
+          <ident name="i"/>
+        </binop>
+      </assign>
+      <increment var="i"/>
+      <condition op="&gt;">
+        <ident name="i"/>
+        <number value="10"/>
+      </condition>
+    </repeat>
+  </block>
+</program>
