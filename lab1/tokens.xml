@@ -1,0 +1,50 @@
+<?xml version="1.0" ?>
+<lexer_output>
+  <keywords>
+    <entry index="0">var</entry>
+    <entry index="1">integer</entry>
+    <entry index="2">begin</entry>
+    <entry index="3">repeat</entry>
+    <entry index="4">until</entry>
+    <entry index="5">end</entry>
+  </keywords>
+  <identifiers>
+    <entry index="0">i</entry>
+    <entry index="1">sum</entry>
+  </identifiers>
+  <token_stream>
+    <token type="KW" line="1" value="var" code="KW[0]"/>
+    <token type="ID" line="2" value="i" code="ID[0]"/>
+    <token type="DELIM" line="2" value="," code="','"/>
+    <token type="ID" line="2" value="sum" code="ID[1]"/>
+    <token type="DELIM" line="2" value=":" code="':'"/>
+    <token type="KW" line="2" value="integer" code="KW[1]"/>
+    <token type="DELIM" line="2" value=";" code="';'"/>
+    <token type="KW" line="3" value="begin" code="KW[2]"/>
+    <token type="ID" line="4" value="i" code="ID[0]"/>
+    <token type="OP" line="4" value=":=" code="':='"/>
+    <token type="NUM" line="4" value="1" code="NUM(1)"/>
+    <token type="DELIM" line="4" value=";" code="';'"/>
+    <token type="ID" line="5" value="sum" code="ID[1]"/>
+    <token type="OP" line="5" value=":=" code="':='"/>
+    <token type="NUM" line="5" value="0" code="NUM(0)"/>
+    <token type="DELIM" line="5" value=";" code="';'"/>
+    <token type="KW" line="6" value="repeat" code="KW[3]"/>
+    <token type="ID" line="7" value="sum" code="ID[1]"/>
+    <token type="OP" line="7" value=":=" code="':='"/>
+    <token type="ID" line="7" value="sum" code="ID[1]"/>
+    <token type="OP" line="7" value="+" code="'+'"/>
+    <token type="ID" line="7" value="i" code="ID[0]"/>
+    <token type="DELIM" line="7" value=";" code="';'"/>
+    <token type="ID" line="8" value="i" code="ID[0]"/>
+    <token type="OP" line="8" value="++" code="'++'"/>
+    <token type="DELIM" line="8" value=";" code="';'"/>
+    <token type="KW" line="9" value="until" code="KW[4]"/>
+    <token type="ID" line="9" value="i" code="ID[0]"/>
+    <token type="OP" line="9" value="&gt;" code="'&gt;'"/>
+    <token type="NUM" line="9" value="10" code="NUM(10)"/>
+    <token type="DELIM" line="9" value=";" code="';'"/>
+    <token type="KW" line="10" value="end" code="KW[5]"/>
+    <token type="DELIM" line="10" value="." code="'.'"/>
+  </token_stream>
+</lexer_output>
