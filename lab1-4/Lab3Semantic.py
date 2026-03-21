@@ -52,12 +52,12 @@ def main():
     root = load_ast(ast_path)
     declared, errors = analyze(root)
 
-    print("=== Таблица объявленных идентификаторов ===")
+    print("Таблица объявленных идентификаторов")
     for name, line in declared.items():
         print(f"  {name}")
 
     if errors:
-        print("\n=== Семантические ошибки ===")
+        print("\nСемантические ошибки")
         for e in errors:
             print(f"  [ОШИБКА] {e}")
     else:
