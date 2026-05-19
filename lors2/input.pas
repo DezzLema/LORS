@@ -1,9 +1,12 @@
-program Test8;
+program Test5;
 var
-  x: integer
+  a, b, c: integer;
 begin
-  x := 5;
+  a := 1;
+  b := 2;
+  c := 10;
   repeat
-    x := x - 1;
-  until x = 0;
+    a := a * 2;
+    b := (a + b) * 2;
+  until a > c;
 end.

@@ -1,13 +1,13 @@
-# lab2_parser.py
 import sys
 import os
 
 
 class ASTNode:
+    """Узел абстрактного синтаксического дерева"""
     def __init__(self, node_type, value=None, children=None):
-        self.type = node_type
-        self.value = value
-        self.children = children if children else []
+        self.type = node_type    # тип узла: Program, Block, Assignment и т.д.
+        self.value = value       # значение (имя переменной, число, оператор)
+        self.children = children if children else []  # дочерние узлы
 
     def add_child(self, child):
         self.children.append(child)
@@ -19,12 +19,12 @@ class Parser:
         self.pos = 0
         self.n = len(self.tokens)
 
-        # Таблицы: оригинал -> условное
+        # Сохраняем таблицы для обратного преобразования (условное -> оригинал)
         self.keywords_table = keywords_table
         self.identifiers_table = identifiers_table
         self.numbers_table = numbers_table
 
-        # Обратные отображения: условное -> оригинал
+        # Обратные отображения: из условного обозначения получаем исходное значение
         self.reverse_keywords = {v: k for k, v in keywords_table.items()}
         self.reverse_identifiers = {v: k for k, v in identifiers_table.items()}
         self.reverse_numbers = {v: int(k) for k, v in numbers_table.items()}
@@ -32,6 +32,7 @@ class Parser:
         self.ast_root = None
 
     def parse(self):
+        """Запускаем разбор с правила program"""
         self.ast_root = self._parse_program()
 
         if self.pos < self.n:
@@ -40,35 +41,37 @@ class Parser:
 
         return self.ast_root
 
+    # Вспомогательные методы для работы с токенами
     def _current_token(self):
         return self.tokens[self.pos] if self.pos < self.n else None
 
     def _match(self, expected):
+        """Проверяем, соответствует ли текущий токен ожидаемому"""
         if self._current_token() == expected:
             self.pos += 1
             return True
         return False
 
     def _expect(self, expected):
+        """Требуем, чтобы текущий токен был ожидаемым, иначе ошибка"""
         if not self._match(expected):
             print(f'Syntax error: expected {expected}, found {self._current_token()}')
             sys.exit(1)
 
+    # Методы для получения исходных значений из условных обозначений
     def _get_original_identifier(self, token):
         return self.reverse_identifiers.get(token, token)
 
     def _get_original_number(self, token):
         return self.reverse_numbers.get(token, token)
 
-    def _get_keyword_name(self, token):
-        return self.reverse_keywords.get(token, token)
-
+    # Грамматические правила
     def _parse_program(self):
-        # program
-        self._expect('KW1')
+        """program -> 'program' ID ';' block '.'"""
+        self._expect('KW1')          # program
         prog_node = ASTNode('Program')
 
-        # Program name
+        # Имя программы
         prog_name_token = self._current_token()
         if not prog_name_token or not prog_name_token.startswith('ID'):
             print('Error: expected program name')
@@ -78,7 +81,6 @@ class Parser:
 
         self._expect(';')
 
-        # Block
         block_node = self._parse_block()
         prog_node.add_child(block_node)
 
@@ -87,32 +89,30 @@ class Parser:
         return prog_node
 
     def _parse_block(self):
+        """block -> [ 'var' var_declarations ] 'begin' statements 'end' """
         block_node = ASTNode('Block')
 
-        # Var section (if exists)
-        if self._current_token() == 'KW2':
+        # Секция var (опциональна)
+        if self._current_token() == 'KW2':     # var
             self.pos += 1
             var_decls = self._parse_var_declarations()
             for decl in var_decls:
                 block_node.add_child(decl)
 
-        # begin
-        self._expect('KW4')
-
-        # Statements
+        self._expect('KW4')                    # begin
         stmts_node = self._parse_statements()
         block_node.add_child(stmts_node)
-
-        # end
-        self._expect('KW7')
+        self._expect('KW7')                    # end
 
         return block_node
 
     def _parse_var_declarations(self):
+        """var_declarations -> ( ID ( ',' ID )* ':' 'integer' ';' )* """
         declarations = []
 
         while self._current_token() and self._current_token().startswith('ID'):
             identifiers = []
+            # Собираем список идентификаторов через запятую
             while True:
                 id_token = self._current_token()
                 if not id_token or not id_token.startswith('ID'):
@@ -127,13 +127,7 @@ class Parser:
                     break
 
             self._expect(':')
-
-            # integer
-            if self._current_token() != 'KW3':
-                print(f'Error: expected integer, found {self._current_token()}')
-                sys.exit(1)
-            self.pos += 1
-
+            self._expect('KW3')                # integer
             self._expect(';')
 
             for var_name in identifiers:
@@ -142,8 +136,10 @@ class Parser:
         return declarations
 
     def _parse_statements(self):
+        """statements -> statement ( ';' statement )* """
         stmts_node = ASTNode('Statements')
 
+        # Парсим операторы, пока не встретим 'end' или 'until'
         while self._current_token() and self._current_token() not in ['KW7', 'KW6']:
             stmt = self._parse_statement()
             if stmt:
@@ -155,23 +151,25 @@ class Parser:
         return stmts_node
 
     def _parse_statement(self):
+        """statement -> assignment | repeat_loop"""
         current = self._current_token()
 
         if current is None:
             return None
 
-        # Assignment
+        # Присваивание
         if current.startswith('ID'):
             return self._parse_assignment()
 
-        # repeat
-        if current == 'KW5':
+        # Цикл repeat
+        if current == 'KW5':    # repeat
             return self._parse_repeat_loop()
 
         print(f'Error: unexpected token {current}')
         sys.exit(1)
 
     def _parse_assignment(self):
+        """assignment -> ID ':=' expression"""
         id_token = self._current_token()
         var_name = self._get_original_identifier(id_token)
         self.pos += 1
@@ -186,14 +184,15 @@ class Parser:
         return assign_node
 
     def _parse_repeat_loop(self):
-        self._expect('KW5')
+        """repeat_loop -> 'repeat' statements 'until' condition"""
+        self._expect('KW5')      # repeat
 
         repeat_node = ASTNode('RepeatLoop')
 
         body_node = self._parse_statements()
         repeat_node.add_child(body_node)
 
-        self._expect('KW6')
+        self._expect('KW6')      # until
 
         condition_node = self._parse_condition()
         repeat_node.add_child(condition_node)
@@ -201,6 +200,7 @@ class Parser:
         return repeat_node
 
     def _parse_expression(self):
+        """expression -> term ( ('+'|'-') term )* """
         left = self._parse_term()
 
         while self._current_token() in {'+', '-'}:
@@ -216,6 +216,7 @@ class Parser:
         return left
 
     def _parse_term(self):
+        """term -> factor ( ('*'|'/') factor )* """
         left = self._parse_factor()
 
         while self._current_token() in {'*', '/'}:
@@ -231,6 +232,7 @@ class Parser:
         return left
 
     def _parse_factor(self):
+        """factor -> ID | NUM | '(' expression ')'"""
         current = self._current_token()
 
         if current.startswith('ID'):
@@ -253,6 +255,7 @@ class Parser:
         sys.exit(1)
 
     def _parse_condition(self):
+        """condition -> expression comparison_operator expression"""
         left = self._parse_expression()
 
         op = self._current_token()
@@ -271,7 +274,7 @@ class Parser:
 
 
 def load_tables_from_file(filepath):
-    """Loads tables from file created by lexical analyzer"""
+    """Загружает таблицы из файла, созданного лексическим анализатором"""
     keywords_table = {}
     identifiers_table = {}
     numbers_table = {}
@@ -280,17 +283,17 @@ def load_tables_from_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as f:
         lines = f.readlines()
 
-    # First line - token sequence
+    # Первая строка - последовательность токенов
     i = 0
     if lines:
         token_sequence = lines[0].strip()
         i = 1
 
-    # Skip empty lines
+    # Пропускаем пустые строки
     while i < len(lines) and not lines[i].strip():
         i += 1
 
-    # Read tables
+    # Читаем таблицы
     current_table = None
     while i < len(lines):
         line = lines[i].strip()
@@ -308,12 +311,11 @@ def load_tables_from_file(filepath):
             i += 1
             continue
 
-        # Skip empty lines inside table
         if not line:
             i += 1
             continue
 
-        # Parse lines like "KW1:program"
+        # Строки имеют формат "KW1:program"
         if current_table and ':' in line:
             parts = line.split(':', 1)
             if len(parts) == 2:
@@ -333,6 +335,7 @@ def load_tables_from_file(filepath):
 
 
 class ASTSaver:
+    """Сохраняет AST в текстовом виде с отступами"""
     def __init__(self, ast_root, output_path):
         self.ast_root = ast_root
         self.output_path = output_path
@@ -344,6 +347,7 @@ class ASTSaver:
             self._print_tree(self.ast_root, f, 0)
 
     def _print_tree(self, node, file, level):
+        """Рекурсивно выводим дерево: уровень отступа = 2 пробела * уровень вложенности"""
         indent = '  ' * level
 
         if node.value is not None:

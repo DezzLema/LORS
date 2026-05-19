@@ -13,8 +13,7 @@ class ASTNode:
 
 
 class ASTParser:
-    """Parses the AST from text format back into ASTNode structure"""
-
+    """Восстанавливает AST из текстового файла"""
     @staticmethod
     def parse_from_file(filepath):
         with open(filepath, 'r', encoding='utf-8') as f:
@@ -27,11 +26,9 @@ class ASTParser:
             if not line.strip():
                 continue
 
-            # Calculate indent level
             indent = len(line) - len(line.lstrip())
             content = line.strip()
 
-            # Parse node type and value
             if ': ' in content:
                 parts = content.split(': ', 1)
                 node_type = parts[0]
@@ -46,7 +43,6 @@ class ASTParser:
                 root = node
                 stack = [(node, 0)]
             else:
-                # Find parent
                 while stack and stack[-1][1] >= indent:
                     stack.pop()
                 if stack:
@@ -57,6 +53,7 @@ class ASTParser:
 
 
 class CodeGenerator:
+    """Генерирует C-код из AST"""
     def __init__(self, ast_root, symbol_table_path):
         self.ast = ast_root
         self.output_code = []
@@ -64,6 +61,7 @@ class CodeGenerator:
         self.symbol_table = self._load_symbol_table(symbol_table_path)
 
     def _load_symbol_table(self, filepath):
+        """Загружает таблицу символов, чтобы знать, какие переменные объявлены"""
         symbol_table = {}
         if not os.path.exists(filepath):
             return symbol_table
@@ -80,6 +78,7 @@ class CodeGenerator:
                 continue
             if in_table and line.strip() and not line.startswith('-'):
                 parts = line.strip().split()
+                # Пропускаем заголовки таблицы
                 if parts and not parts[0].startswith('-') and parts[0] not in ['Variable', 'Status']:
                     var_name = parts[0]
                     if var_name and var_name[0].isalpha():
@@ -93,21 +92,22 @@ class CodeGenerator:
             return ''
 
         print('Starting code generation...')
-
         self._visit_node(self.ast)
-
         return '\n'.join(self.output_code)
 
     def _emit_line(self, line=''):
+        """Выводит строку с учётом текущего уровня отступа"""
         if line:
             self.output_code.append('    ' * self.indent_level + line)
         else:
             self.output_code.append('')
 
     def _visit_node(self, node):
+        """Обходит AST и генерирует код для каждого узла"""
         node_type = node.type
 
         if node_type == 'Program':
+            # Создаём функцию с именем программы
             prog_name = node.value if node.value else 'main'
             self._emit_line(f'int {prog_name}(void) ' + '{')
             self.indent_level += 1
@@ -123,6 +123,7 @@ class CodeGenerator:
                 self._visit_node(child)
 
         elif node_type == 'VarDeclaration':
+            # Объявление переменной в C
             var_name = node.value
             self._emit_line(f'int {var_name};')
 
@@ -138,6 +139,7 @@ class CodeGenerator:
                 self._emit_line(f'{var_name} = {expr};')
 
         elif node_type == 'RepeatLoop':
+            # repeat...until превращается в do...while в C
             self._emit_line('do {')
             self.indent_level += 1
 
@@ -149,21 +151,14 @@ class CodeGenerator:
             self.indent_level -= 1
             self._emit_line('} while (')
 
+            # Добавляем условие в ту же строку, что и while
             for child in children:
                 if child.type == 'Condition':
                     cond_expr = self._generate_condition(child)
                     self.output_code[-1] = self.output_code[-1] + cond_expr + ');'
 
-        elif node_type == 'Condition':
-            pass
-
-        elif node_type == 'BinaryOp':
-            pass
-
-        elif node_type == 'Variable':
-            pass
-
-        elif node_type == 'Number':
+        # Узлы, которые не порождают код напрямую, а только обрабатываются в детях
+        elif node_type in ('Condition', 'BinaryOp', 'Variable', 'Number'):
             pass
 
         else:
@@ -171,6 +166,7 @@ class CodeGenerator:
                 self._visit_node(child)
 
     def _generate_expression(self, node):
+        """Рекурсивно генерирует строку выражения"""
         node_type = node.type
 
         if node_type == 'BinaryOp':
@@ -190,12 +186,14 @@ class CodeGenerator:
         return '0'
 
     def _generate_condition(self, node):
+        """Генерирует условие для цикла, заменяя паскалевские операторы на C-шные"""
         children = node.children
         if len(children) >= 2:
             left = self._generate_expression(children[0])
             right = self._generate_expression(children[1])
             op = node.value
 
+            # В C нет :=, = означает сравнение, а <> заменяем на !=
             if op == '=':
                 op = '=='
             elif op == '<>':
@@ -236,11 +234,11 @@ def main():
     generator = CodeGenerator(ast_root, semantic_path)
     output_code = generator.generate()
 
-    saver = CCodeOutputSaver(output_code, 'output/generated_code.с')
+    saver = CCodeOutputSaver(output_code, 'output/generated_code.c')
     saver.save()
 
     print('Code generation complete')
-    print('Result saved to output/generated_code.txt')
+    print('Result saved to output/generated_code.c')
 
 
 if __name__ == '__main__':

@@ -3,6 +3,7 @@ import os
 
 
 class ASTNode:
+    """Узел AST - нужно для восстановления дерева из текстового файла"""
     def __init__(self, node_type, value=None, children=None):
         self.type = node_type
         self.value = value
@@ -13,25 +14,24 @@ class ASTNode:
 
 
 class ASTParser:
-    """Parses the AST from text format back into ASTNode structure"""
-
+    """Восстанавливает AST из текстового файла"""
     @staticmethod
     def parse_from_file(filepath):
         with open(filepath, 'r', encoding='utf-8') as f:
             lines = f.readlines()
 
         root = None
-        stack = []
+        stack = []  # хранит (узел, уровень_отступа)
 
         for line in lines:
             if not line.strip():
                 continue
 
-            # Calculate indent level
+            # Определяем уровень вложенности по отступам
             indent = len(line) - len(line.lstrip())
             content = line.strip()
 
-            # Parse node type and value
+            # Парсим строку: либо "Тип: значение", либо просто "Тип"
             if ': ' in content:
                 parts = content.split(': ', 1)
                 node_type = parts[0]
@@ -43,10 +43,11 @@ class ASTParser:
             node = ASTNode(node_type, node_value)
 
             if indent == 0:
+                # Корневой узел
                 root = node
                 stack = [(node, 0)]
             else:
-                # Find parent
+                # Ищем родителя: убираем из стека всех, у кого уровень >= текущего
                 while stack and stack[-1][1] >= indent:
                     stack.pop()
                 if stack:
@@ -57,8 +58,9 @@ class ASTParser:
 
 
 class SymbolTable:
+    """Таблица символов: хранит все переменные и проверяет их использование"""
     def __init__(self):
-        self.symbols = {}
+        self.symbols = {}   # имя переменной -> {'declared': True, 'used': False}
         self.errors = []
 
     def declare_variable(self, name):
@@ -89,6 +91,7 @@ class SymbolTable:
 
 
 class SemanticAnalyzer:
+    """Обходит AST и проверяет семантику: объявлены ли переменные, нет ли повторных объявлений"""
     def __init__(self, ast_root):
         self.ast = ast_root
         self.symbol_table = SymbolTable()
@@ -114,6 +117,7 @@ class SemanticAnalyzer:
         return True
 
     def _visit_node(self, node):
+        """Рекурсивный обход AST: для каждого типа узла своя логика"""
         node_type = node.type
 
         if node_type == 'Program':
@@ -125,6 +129,7 @@ class SemanticAnalyzer:
                 self._visit_node(child)
 
         elif node_type == 'VarDeclaration':
+            # Встретили объявление переменной - добавляем в таблицу символов
             var_name = node.value
             self.symbol_table.declare_variable(var_name)
 
@@ -133,6 +138,7 @@ class SemanticAnalyzer:
                 self._visit_node(child)
 
         elif node_type == 'Assignment':
+            # В левой части присваивания - использование переменной
             var_name = node.value
             self.symbol_table.use_variable(var_name)
             for child in node.children:
@@ -151,11 +157,12 @@ class SemanticAnalyzer:
                 self._visit_node(child)
 
         elif node_type == 'Variable':
+            # Использование переменной в выражении
             var_name = node.value
             self.symbol_table.use_variable(var_name)
 
         elif node_type == 'Number':
-            pass
+            pass    # числа не нужно проверять
 
         else:
             for child in node.children:
@@ -175,7 +182,6 @@ class SemanticOutputSaver:
 
         with open(self.output_path, 'w', encoding='utf-8') as f:
             f.write('SEMANTIC ANALYSIS RESULTS\n\n')
-
             f.write('Symbol Table:\n')
             f.write('-' * 40 + '\n')
             f.write(f"{'Variable':<15} {'Status':<20}\n")
