@@ -1,0 +1,12 @@
+int Example(void) {
+    int counter;
+    int result;
+    int limit;
+    counter = 0;
+    result = 0;
+    limit = 10;
+    do {
+        counter = (counter + 1);
+        result = (result + counter);
+    } while (counter >= limit);
+}

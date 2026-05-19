@@ -1,0 +1,15 @@
+program
+  var_declaration
+    variable (i)
+  block
+    statement_list
+      assignment
+        identifier (i)
+        number (0)
+      repeat_until
+        statement_list
+          inc
+            identifier (i)
+        operator (=)
+          identifier (i)
+          number (10)

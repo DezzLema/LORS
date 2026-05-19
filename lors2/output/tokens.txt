@@ -1,0 +1,21 @@
+KW1 ID1 ; KW2 ID2 , ID3 , ID4 : KW3 ; KW4 ID2 := NUM1 ; ID3 := NUM1 ; ID4 := NUM2 ; KW5 ID2 := ID2 + NUM3 ; ID3 := ID3 + ID2 KW6 ID2 >= ID4 KW7 .
+
+KEYWORDS TABLE
+KW1:program
+KW2:var
+KW3:integer
+KW4:begin
+KW5:repeat
+KW6:until
+KW7:end
+
+IDENTIFIERS TABLE
+ID1:Example
+ID2:counter
+ID3:result
+ID4:limit
+
+NUMBERS TABLE
+NUM1:0
+NUM2:10
+NUM3:1

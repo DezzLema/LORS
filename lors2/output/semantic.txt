@@ -1,0 +1,13 @@
+SEMANTIC ANALYSIS RESULTS
+
+Symbol Table:
+----------------------------------------
+Variable        Status              
+----------------------------------------
+counter         declared and used
+result          declared and used
+limit           declared and used
+
+----------------------------------------
+
+No errors found.

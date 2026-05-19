@@ -1,0 +1,25 @@
+Program: Example
+  Block
+    VarDeclaration: counter
+    VarDeclaration: result
+    VarDeclaration: limit
+    Statements
+      Assignment: counter
+        Number: 0
+      Assignment: result
+        Number: 0
+      Assignment: limit
+        Number: 10
+      RepeatLoop
+        Statements
+          Assignment: counter
+            BinaryOp: +
+              Variable: counter
+              Number: 1
+          Assignment: result
+            BinaryOp: +
+              Variable: result
+              Variable: counter
+        Condition: >=
+          Variable: counter
+          Variable: limit
