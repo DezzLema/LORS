@@ -1,7 +1,11 @@
 // повторное объявление переменной
-var x, y: integer;
-var x: integer;
+program Test4;
+var
+  x: integer;
+  x: integer;
 begin
-    x := 5;
-    y := 10
+  x := 1;
+  repeat
+    x := x + 1;
+  until x = 10;
 end.

@@ -1,12 +1,10 @@
-//Тест с вложенными операциями
-var counter, limit, step: integer;
+//Ошибка синтаксиса - пропущена точка с запятой
+program Test8;
+var
+  x: integer
 begin
-    counter := 0;
-    limit := 10;
-    step := 2;
-    repeat
-        inc(counter);
-        step := step + 1
-    until counter >= limit;
-    counter := step
+  x := 5;
+  repeat
+    x := x - 1;
+  until x = 0;
 end.

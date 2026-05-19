@@ -4,9 +4,9 @@ Symbol Table:
 ----------------------------------------
 Variable        Status              
 ----------------------------------------
-counter         declared and used
-result          declared and used
-limit           declared and used
+a               declared and used
+b               declared and used
+c               declared and used
 
 ----------------------------------------
 

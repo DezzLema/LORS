@@ -1,12 +1,9 @@
-program Example;
+program Test8;
 var
-    counter, result, limit: integer;
+  x: integer
 begin
-    counter := 0;
-    result := 0;
-    limit := 10;
-    repeat
-        counter := counter + 1;
-        result := result + counter
-    until counter >= limit
+  x := 5;
+  repeat
+    x := x - 1;
+  until x = 0;
 end.

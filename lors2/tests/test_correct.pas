@@ -1,8 +1,8 @@
+program main;
 var
-  i: integer;
+    i: integer;
 begin
-  i := 0;
-  repeat
-    inc(i);
-  until i = 10;
+    repeat
+        i := i + 1;
+    until i <= 10
 end.

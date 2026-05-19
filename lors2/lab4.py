@@ -236,7 +236,7 @@ def main():
     generator = CodeGenerator(ast_root, semantic_path)
     output_code = generator.generate()
 
-    saver = CCodeOutputSaver(output_code, 'output/generated_code.txt')
+    saver = CCodeOutputSaver(output_code, 'output/generated_code.с')
     saver.save()
 
     print('Code generation complete')

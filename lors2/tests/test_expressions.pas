@@ -1,14 +1,13 @@
-//Тест со сложными выражениями и сравнениями
-var a, b, c, result: integer;
+//Тест со сложными выражениями
+program Test5;
+var
+  a, b, c: integer;
 begin
-    a := 100;
-    b := 200;
-    c := 300;
-    result := a + b - c;
-    inc(result);
-    repeat
-        a := a - 10;
-        b := b + 5
-    until a < b;
-    c := result
+  a := 1;
+  b := 2;
+  c := 10;
+  repeat
+    a := a * 2;
+    b := (a + b) * 2;
+  until a > c;
 end.

@@ -1,6 +1,11 @@
 //Тест с необъявленной переменной
-var x: integer;
+program Test3;
+var
+  x: integer;
 begin
-    x := 5;
-    y := 10
+  x := 0;
+  repeat
+    x := x + 1;
+    y := x * 2;
+  until x = 5;
 end.
